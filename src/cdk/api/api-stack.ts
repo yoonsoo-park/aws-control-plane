@@ -4,7 +4,7 @@ import { version } from '../../../package.json';
 import { AppTempApiGateway } from './api-gateway';
 import { AppTempKey } from '../security/kms/kms-key';
 
-export class AppTempApiStack extends Stack {
+export class ApiStack extends Stack {
 	restApiId: string;
 	kmsKeyArn: string;
 

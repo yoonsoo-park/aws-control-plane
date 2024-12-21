@@ -1,19 +1,19 @@
 import { ApiStageType, Feature, StageableStackProps, Utility } from '@ncino/aws-cdk';
 import { DeployStack } from '../deploy/deploy-stack';
-import { AppTempApiStack } from '../src/cdk/api/api-stack';
-import { EventStack } from '../src/cdk/event/event-stack';
-import { AppTempComputeStack } from '../src/cdk/compute/compute-stack';
+import { ApiStack } from '../src/cdk/api/api-stack';
+import { WebsiteStack } from '../src/cdk/website/website-stack';
 
 const deployAccount = process.env.CDK_DEPLOY_ACCOUNT || process.env.CDK_DEFAULT_ACCOUNT;
 const deployRegion = process.env.CDK_DEPLOY_REGION || process.env.CDK_DEFAULT_REGION;
 
 const feature = new Feature({
-	name: 'AppTemplate',
-	description: '',
+	name: 'OmniChannelControlPlane',
+	description: 'OmniChannel Control Plane for centralized nCino product access',
 });
 const stageName = feature.getContext('stage') || ApiStageType.BLUE;
 const stackProps: StageableStackProps = {
-	description: 'Required. Contains compute resources for AppTemplate.',
+	description:
+		'Required. Contains API and static hosting resources for OmniChannel Control Plane.',
 	env: { account: process.env.AWS_ACCOUNT, region: process.env.REGION },
 	stageName,
 };
@@ -21,35 +21,11 @@ const stackProps: StageableStackProps = {
 if (Utility.isDevopsAccount()) {
 	new DeployStack(feature);
 } else {
+	console.log('🛠  Website Stack');
+	const websiteStack = new WebsiteStack(feature, stackProps);
+
 	console.log('🛠  API Stack');
-	const apiStack: AppTempApiStack = new AppTempApiStack(feature, stackProps);
-
-	console.log('🛠  Compute Stack');
-	new AppTempComputeStack(
-		feature,
-		apiStack.kmsKeyArn,
-		apiStack.restApiId,
-		`${feature.getFullName('ComputeStack')}-${stageName}`,
-		stackProps,
-		{},
-	);
-
-	console.log('🛠  Event Stack');
-	const eventStack = new EventStack(
-		feature,
-		`${feature.getFullName('EventStack')}`,
-		{
-			description: 'Required. Contains EventBridge resources for State Provisioning.',
-			env: {
-				account: deployAccount,
-				region: deployRegion,
-			},
-			stageName,
-		},
-		{},
-	);
-	feature.setStack('eventStack', eventStack);
-	feature.iamStack.addDependency(eventStack);
+	new ApiStack(feature, stackProps);
 }
 
 feature.synth();

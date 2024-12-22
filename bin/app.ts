@@ -14,7 +14,7 @@ const stageName = feature.getContext('stage') || ApiStageType.BLUE;
 const stackProps: StageableStackProps = {
 	description:
 		'Required. Contains API and static hosting resources for OmniChannel Control Plane.',
-	env: { account: process.env.AWS_ACCOUNT, region: process.env.REGION },
+	env: { account: deployAccount, region: deployRegion },
 	stageName,
 };
 
@@ -22,10 +22,20 @@ if (Utility.isDevopsAccount()) {
 	new DeployStack(feature);
 } else {
 	console.log('🛠  Website Stack');
-	const websiteStack = new WebsiteStack(feature, stackProps);
+	const websiteStack = new WebsiteStack(
+		feature,
+		`${feature.getFullName('WebsiteStack')}`,
+		stackProps,
+	);
+	feature.setStack('websiteStack', websiteStack);
 
 	console.log('🛠  API Stack');
-	new ApiStack(feature, stackProps);
+	const apiStack = new ApiStack(feature, `${feature.getFullName('ApiStack')}`, stackProps);
+	feature.setStack('apiStack', apiStack);
+
+	// Set up dependencies
+	feature.iamStack.addDependency(websiteStack);
+	apiStack.addDependency(websiteStack);
 }
 
 feature.synth();

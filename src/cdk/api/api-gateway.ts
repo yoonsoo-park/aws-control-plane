@@ -21,11 +21,11 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 		});
 
 		// Create IAM Resources
-		const appTemplateRole = new Role(stack, stack.getFullName('role'), {
+		const omnichannelControlPlaneRole = new Role(stack, stack.getFullName('role'), {
 			assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
 		});
-		const appTemplateUser = new User(stack, stack.getFullName('user'), {
-			userName: `App-Template-user-${stack.getContext('suffix')}`,
+		const omnichannelControlPlaneUser = new User(stack, stack.getFullName('user'), {
+			userName: `OmniChannelControlPlane-user-${stack.getContext('suffix')}`,
 		});
 
 		const allowInvokeApi = new PolicyStatement({
@@ -41,8 +41,8 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 		});
 
 		// Assign Permissions
-		appTemplateUser.addToPolicy(allowInvokeApi);
-		appTemplateRole.addToPolicy(allowInvokeLambda);
+		omnichannelControlPlaneUser.addToPolicy(allowInvokeApi);
+		omnichannelControlPlaneRole.addToPolicy(allowInvokeLambda);
 
 		// Create Responses
 		const integrationResponses = this.buildIntegrationResponses();
@@ -52,7 +52,7 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 		const triggerResource = this.addResource(this.root, 'trigger');
 
 		// Create Deployment
-		const deployment = this.addDeployment('App-Template API deployment');
+		const deployment = this.addDeployment('OmniChannelControlPlane API deployment');
 
 		// Create Blue Stage
 		const blueStage: Stage = this.addDeploymentStage(
@@ -60,7 +60,7 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 			'blue',
 			deployment,
 			{
-				TriggerLambda: `AppTemplate-AppTemplateTriggerLambda-${this.stack.getContext('suffix')}-blue`,
+				TriggerLambda: `OmniChannelControlPlane-OmniChannelControlPlaneTriggerLambda-${this.stack.getContext('suffix')}-blue`,
 			},
 		);
 
@@ -70,7 +70,7 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 			'green',
 			deployment,
 			{
-				TriggerLambda: `AppTemplate-AppTemplateTriggerLambda-${this.stack.getContext('suffix')}-green`,
+				TriggerLambda: `OmniChannelControlPlane-OmniChannelControlPlaneTriggerLambda-${this.stack.getContext('suffix')}-green`,
 			},
 		);
 
@@ -79,7 +79,7 @@ export class AppTempApiGateway extends ApiGatewayDevops {
 			modelName: 'RequestModel',
 			schema: {
 				schema: JsonSchemaVersion.DRAFT4,
-				title: 'triggerAppTemplate',
+				title: 'triggerOmniChannelControlPlane',
 				type: JsonSchemaType.OBJECT,
 				properties: {
 					packages: { type: JsonSchemaType.ARRAY },

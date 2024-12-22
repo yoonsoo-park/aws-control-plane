@@ -1,23 +1,15 @@
 import { Tags } from 'aws-cdk-lib';
-import { App, Stack, StackConfig, Utility } from '@ncino/aws-cdk';
+import { StageableStack, Feature, StageableStackProps } from '@ncino/aws-cdk';
 import { version } from '../../../package.json';
 import { AppTempApiGateway } from './api-gateway';
 import { AppTempKey } from '../security/kms/kms-key';
 
-export class ApiStack extends Stack {
+export class ApiStack extends StageableStack {
 	restApiId: string;
 	kmsKeyArn: string;
 
-	constructor(scope: App, props?: StackConfig) {
-		super(
-			scope,
-			Utility.createResourceName(
-				'ApiStack',
-				scope.getContext('suffix'),
-				scope.getContext('appName'),
-			),
-			props,
-		);
+	constructor(feature: Feature, id: string, props: StageableStackProps) {
+		super(feature, id, props);
 
 		// Create KmsKey
 		const kmsKey = new AppTempKey(this);
@@ -28,7 +20,7 @@ export class ApiStack extends Stack {
 		this.restApiId = apiGateway.restApiId;
 
 		// add env tag
-		Tags.of(this).add('env', scope.getContext('suffix'));
+		Tags.of(this).add('env', feature.getContext('suffix'));
 		Tags.of(this).add('version', version);
 	}
 }

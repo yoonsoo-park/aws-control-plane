@@ -94,11 +94,11 @@ export class PythonLambda {
 		);
 
 		const triggerStepFunction = this.createPythonLambdaFunction({
-			name: 'AppTempTriggerLambda',
+			name: 'OmniChannelControlPlaneTriggerLambda',
 			codePath: 'src/lambda-functions/trigger_lambda',
 			handler: 'trigger_lambda.lambda_handler',
 			environment: {
-				APP_TEMP_STATE_MACHINE_ARN: this.environment.appTemplateStateMachineArn,
+				APP_TEMP_STATE_MACHINE_ARN: this.environment.omniChannelControlPlaneStateMachineArn,
 			},
 			kmsKeyArn: this.environment.kmsKeyArn,
 			restApiId: this.environment.restApiId,
@@ -109,7 +109,7 @@ export class PythonLambda {
 			new PolicyStatement({
 				actions: ['states:StartExecution'],
 				effect: Effect.ALLOW,
-				resources: [this.environment.appTemplateStateMachineArn],
+				resources: [this.environment.omniChannelControlPlaneStateMachineArn],
 				sid: 'StartStateMachine',
 			}),
 		);

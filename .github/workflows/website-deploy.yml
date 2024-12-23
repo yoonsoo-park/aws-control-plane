@@ -1,0 +1,67 @@
+name: Website Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/cdk/website/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/cdk/website/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: src/cdk/website
+        run: npm ci
+      
+      - name: Build Next.js app
+        working-directory: src/cdk/website
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Upload to S3
+        working-directory: src/cdk/website
+        run: |
+          aws s3 sync .next/static s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/static/
+          aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/
+          aws s3 sync .next/server s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/server/
+          aws s3 cp .next/standalone/server.js s3://${{ secrets.WEBSITE_BUCKET_NAME }}/server.js
+      
+      - name: Configure S3 website
+        run: |
+          aws s3 website s3://${{ secrets.WEBSITE_BUCKET_NAME }} --index-document index.html --error-document index.html
+          aws s3api put-bucket-policy --bucket ${{ secrets.WEBSITE_BUCKET_NAME }} --policy '{
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "PublicReadGetObject",
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::'${{ secrets.WEBSITE_BUCKET_NAME }}'/*"
+              }
+            ]
+          }'
+      
+      - name: Output website URL
+        run: |
+          echo "Website URL: http://${{ secrets.WEBSITE_BUCKET_NAME }}.s3-website-us-east-1.amazonaws.com" 

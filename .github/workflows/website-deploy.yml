@@ -41,10 +41,18 @@ jobs:
       - name: Upload to S3
         working-directory: src/web
         run: |
-          aws s3 sync .next/static s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/static/
-          aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/
-          aws s3 sync .next/server s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/server/
-          aws s3 cp .next/standalone/server.js s3://${{ secrets.WEBSITE_BUCKET_NAME }}/server.js
+          if [ -d ".next/static" ]; then
+            aws s3 sync .next/static s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/static/
+          fi
+          if [ -d ".next/server" ]; then
+            aws s3 sync .next/server s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/server/
+          fi
+          if [ -f ".next/standalone/server.js" ]; then
+            aws s3 cp .next/standalone/server.js s3://${{ secrets.WEBSITE_BUCKET_NAME }}/server.js
+          fi
+          if [ -d "public" ]; then
+            aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/
+          fi
       
       - name: Configure S3 website
         run: |

@@ -5,8 +5,6 @@ on:
     branches: [ main ]
     paths:
       - 'src/web/**'
-      - 'package.json'
-      - 'package-lock.json'
   workflow_dispatch:
 
 jobs:
@@ -21,9 +19,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: src/web/package-lock.json
       
       - name: Install dependencies
+        working-directory: src/web
         run: npm install
       
       - name: Build Next.js app

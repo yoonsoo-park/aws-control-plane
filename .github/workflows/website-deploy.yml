@@ -54,21 +54,22 @@ jobs:
             aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/
           fi
       
-      # - name: Configure S3 website
-      #   run: |
-      #     aws s3 website s3://${{ secrets.WEBSITE_BUCKET_NAME }} --index-document index.html --error-document index.html
-      #     aws s3api put-bucket-policy --bucket ${{ secrets.WEBSITE_BUCKET_NAME }} --policy '{
-      #       "Version": "2012-10-17",
-      #       "Statement": [
-      #         {
-      #           "Sid": "PublicReadGetObject",
-      #           "Effect": "Allow",
-      #           "Principal": "*",
-      #           "Action": "s3:GetObject",
-      #           "Resource": "arn:aws:s3:::'${{ secrets.WEBSITE_BUCKET_NAME }}'/*"
-      #         }
-      #       ]
-      #     }'
+      # TODO: policy to allow public access
+      # aws s3api put-bucket-policy --bucket ${{ secrets.WEBSITE_BUCKET_NAME }} --policy '{
+      #   "Version": "2012-10-17",
+      #   "Statement": [
+      #     {
+      #       "Sid": "PublicReadGetObject",
+      #       "Effect": "Allow",
+      #       "Principal": "*",
+      #       "Action": "s3:GetObject",
+      #       "Resource": "arn:aws:s3:::'${{ secrets.WEBSITE_BUCKET_NAME }}'/*"
+      #     }
+      #   ]
+      # }'
+      - name: Configure S3 website
+        run: |
+          aws s3 website s3://${{ secrets.WEBSITE_BUCKET_NAME }} --index-document index.html --error-document index.html
       
       # - name: Output website URL
       #   run: |

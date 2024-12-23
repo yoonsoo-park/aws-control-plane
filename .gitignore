@@ -29,3 +29,6 @@ outputfile.xlsx
 
 # Next.js
 .next/
+
+# Website
+out/

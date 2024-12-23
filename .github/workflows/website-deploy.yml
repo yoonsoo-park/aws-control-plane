@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'src/cdk/website/**'
+      - 'src/web/**'
   workflow_dispatch:
 
 jobs:
@@ -19,14 +19,14 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: src/cdk/website/package-lock.json
+          cache-dependency-path: src/web/package-lock.json
       
       - name: Install dependencies
-        working-directory: src/cdk/website
+        working-directory: src/web
         run: npm ci
       
       - name: Build Next.js app
-        working-directory: src/cdk/website
+        working-directory: src/web
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -39,7 +39,7 @@ jobs:
           aws-region: us-east-1
       
       - name: Upload to S3
-        working-directory: src/cdk/website
+        working-directory: src/web
         run: |
           aws s3 sync .next/static s3://${{ secrets.WEBSITE_BUCKET_NAME }}/_next/static/
           aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/

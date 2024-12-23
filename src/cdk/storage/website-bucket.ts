@@ -17,14 +17,20 @@ export class WebsiteBucket extends Bucket {
 			bucketName: name.toLowerCase(),
 			websiteIndexDocument: 'index.html',
 			websiteErrorDocument: 'index.html', // SPA fallback
-			publicReadAccess: false, // We'll use CloudFront for access
-			blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+			publicReadAccess: true, // Enable public read access for testing
+			blockPublicAccess: new BlockPublicAccess({
+				// Allow public access for testing
+				blockPublicAcls: false,
+				blockPublicPolicy: false,
+				ignorePublicAcls: false,
+				restrictPublicBuckets: false,
+			}),
 			encryption: BucketEncryption.S3_MANAGED,
 			enforceSSL: true,
 			versioned: true,
-			objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
+			objectOwnership: ObjectOwnership.OBJECT_WRITER,
 			removalPolicy: RemovalPolicy.RETAIN,
-			accessControl: BucketAccessControl.PRIVATE,
+			accessControl: BucketAccessControl.PUBLIC_READ, // Change to public read
 			cors: [
 				{
 					allowedMethods: [HttpMethods.GET, HttpMethods.HEAD],

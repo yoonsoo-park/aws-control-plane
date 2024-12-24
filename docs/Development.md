@@ -7,8 +7,8 @@
 
 # Initial project checkout setup
 
-1. From the CLI, on app-template project `npm install`
-    - Note: App-template project has a `nvmrc` file that dictates the node version to be used. If `npm install` command fails, update node using the node manager `n $(cat .nvmrc)` run the install again
+1. From the CLI, on control-plane project `npm install`
+    - Note: control-plane project has a `nvmrc` file that dictates the node version to be used. If `npm install` command fails, update node using the node manager `n $(cat .nvmrc)` run the install again
 
 ### AWS Authentication
 
@@ -20,7 +20,7 @@ Click on `Command line or programmatic access` and then copy the credentials und
 
 ![Screenshot 2023-02-22 at 10 16 57 AM](https://user-images.githubusercontent.com/53836265/220666396-c1031061-9c8a-42fc-b116-92613e7c261f.png)
 
-Paste those exports to your `ncino-app-template` project terminal.
+Paste those exports to your `aws-control-plane` project terminal.
 
 ```bash
 export AWS_SESSION_TOKEN=SESSION TOKEN FROM AWS SINGLE SIGN-ON
@@ -59,25 +59,25 @@ Also make sure your credentials have not expired. This happens quite frequently.
 
 ### App Deployment
 
-Below steps are applied to the App-Template project terminal
+Below steps are applied to the aws-control-plane project terminal
 
 1. Ensure the initial project setup and authentication to your AWS account are complete as directed in [AWS Authentication](#aws-authentication) step above
 
 2. Ensure the modules are installed and python virtual environment is created, as directed in the [Initial project checkout setup](#initial-project-checkout-setup)
 
-3. Build the app- project
+3. Build the aws-control-plane project
 
     ```bash
     npm run build
     ```
 
-4. To deploy App-Template stacks:
+4. To deploy aws-control-plane stacks:
 
     ```bash
     npm run aws:deploy
     ```
 
-5. To destroy App-Template stacks once you are done:
+5. To destroy aws-control-plane stacks once you are done:
 
     ```bash
     npm run aws:destroy

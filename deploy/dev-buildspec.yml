@@ -85,6 +85,7 @@ phases:
           # If the regex in grep doesn't find anything then we should build a release and artifact
           if [ -z "$skip_commit" ]; then
             mkdir tmp/ && cd tmp
+            # TODO: EA - change the repo name to the actual repo name
             git clone https://$GITHUB_TOKEN@github.com/yoonsoo-park/aws-control-plane.git && cd aws-control-plane
             git checkout -f "$CODEBUILD_RESOLVED_SOURCE_VERSION"
             npm ci --unsafe-perm
@@ -98,13 +99,12 @@ phases:
         if [[ "$CODEBUILD_BUILD_SUCCEEDING" == "0" ]]; then
           echo " 🤦‍ THE BUILD FAILED 🤦‍ "
           exit 1
-        else
-          cat $CODEBUILD_SRC_DIR/deploy/resources/metaman.txt
         fi
-artifacts:
-  files:
-    - pytest.log
-    - integration.log
-    - "/tmp/testResults/python/test_results.xml"
-  name: metadata-diff
-  discard-paths: yes
+# TODO: EA - add the artifacts for the tests
+# artifacts:
+#   files:
+#     - pytest.log
+#     - integration.log
+#     - "/tmp/testResults/python/test_results.xml"
+#   name: metadata-diff
+#   discard-paths: yes

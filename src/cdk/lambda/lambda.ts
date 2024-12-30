@@ -10,7 +10,8 @@ import { Architecture } from 'aws-cdk-lib/aws-lambda';
  * If you create a new lambda function, add it here.
  */
 export interface NodeLambdaFunctions {
-	dataModelDiffProcessLambda: NodejsFunction;
+	//* Example of how to create a lambda function
+	//* dataModelDiffProcessLambda: NodejsFunction;
 }
 
 export class Lambda {
@@ -64,13 +65,14 @@ export class Lambda {
 		//* 🏗️ ******************************* 🏗️ *//
 		//* Create the lambda functions below    *//
 		//* 🏗️ ******************************* 🏗️ *//
-		this.functions = {
-			dataModelDiffProcessLambda: this.createLambdaFunction({
-				name: 'DataModelDiffProcessLambda',
-				dirName: 'data-model-diff-process-lambda',
-				props: this.appTempLambdaProperties,
-			}),
-		};
+		//* Example of how to create a lambda function
+		// this.functions = {
+		// 	dataModelDiffProcessLambda: this.createLambdaFunction({
+		// 		name: 'DataModelDiffProcessLambda',
+		// 		dirName: 'data-model-diff-process-lambda',
+		// 		props: this.appTempLambdaProperties,
+		// 	}),
+		// };
 	}
 
 	private createLambdaFunction(params: {

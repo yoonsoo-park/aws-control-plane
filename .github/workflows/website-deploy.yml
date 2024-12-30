@@ -54,7 +54,7 @@ jobs:
             aws s3 sync public s3://${{ secrets.WEBSITE_BUCKET_NAME }}/
           fi
       
-      # TODO: policy to allow public access
+      # TODO: EA - policy to allow public access to test or use cloudfront to serve the website
       # aws s3api put-bucket-policy --bucket ${{ secrets.WEBSITE_BUCKET_NAME }} --policy '{
       #   "Version": "2012-10-17",
       #   "Statement": [

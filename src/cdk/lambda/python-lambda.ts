@@ -4,9 +4,10 @@ import { Duration, Size, Tags, Aws } from 'aws-cdk-lib';
 import { PolicyStatement, Effect, ServicePrincipal, Role } from 'aws-cdk-lib/aws-iam';
 
 export interface PythonLambdaFunctions {
-	appTempCompute: Function;
-	triggerStepFunction: Function;
-	salesforceLambda: Function;
+	//* Example of how to create a python lambda function
+	// appTempCompute: Function;
+	// triggerStepFunction: Function;
+	// salesforceLambda: Function;
 }
 
 export class PythonLambda {
@@ -33,92 +34,93 @@ export class PythonLambda {
 		//* 🌎 ******************************* 🌎 *//
 		//* Define the Python Lambdas below      *//
 		//* 🌎 ******************************* 🌎 *//
-		const appTempCompute = this.createPythonLambdaFunction({
-			name: 'AppTempCompute',
-			codePath: 'src/app_temp/compute',
-			handler: 'app_temp_lambda.lambda_handler',
-			environment: {
-				GITHUB_TOKEN: this.environment.githubToken,
-				SF_API_VERSION: this.environment.sf_api_version,
-				BUCKET_NAME: this.environment.BUCKET_NAME,
-			},
-			memorySize: 8960,
-			ephemeralStorageSize: Size.mebibytes(10240),
-			layers: [
-				LambdaLayer.fromLayerVersionArn(
-					this.stack,
-					'gitLambdaLayer',
-					this.stack.getContext('gitLayer'),
-				),
-				appTempDevopsLibLambdaLayer,
-			],
-			timeout: Duration.minutes(15),
-			needsS3Permission: true,
-		});
-		appTempCompute.role.addToPolicy(
-			new PolicyStatement({
-				actions: ['secretsmanager:GetSecretValue'],
-				effect: Effect.ALLOW,
-				resources: [
-					`arn:aws:secretsmanager:us-east-1:182594598204:secret:DevOpsGitHubAccessToken-yeFTHG`,
-				],
-				sid: 'secretsmanager',
-			}),
-		);
+		//* Example of how to create a python lambda function
+		// const appTempCompute = this.createPythonLambdaFunction({
+		// 	name: 'AppTempCompute',
+		// 	codePath: 'src/app_temp/compute',
+		// 	handler: 'app_temp_lambda.lambda_handler',
+		// 	environment: {
+		// 		GITHUB_TOKEN: this.environment.githubToken,
+		// 		SF_API_VERSION: this.environment.sf_api_version,
+		// 		BUCKET_NAME: this.environment.BUCKET_NAME,
+		// 	},
+		// 	memorySize: 8960,
+		// 	ephemeralStorageSize: Size.mebibytes(10240),
+		// 	layers: [
+		// 		LambdaLayer.fromLayerVersionArn(
+		// 			this.stack,
+		// 			'gitLambdaLayer',
+		// 			this.stack.getContext('gitLayer'),
+		// 		),
+		// 		appTempDevopsLibLambdaLayer,
+		// 	],
+		// 	timeout: Duration.minutes(15),
+		// 	needsS3Permission: true,
+		// });
+		// appTempCompute.role.addToPolicy(
+		// 	new PolicyStatement({
+		// 		actions: ['secretsmanager:GetSecretValue'],
+		// 		effect: Effect.ALLOW,
+		// 		resources: [
+		// 			`arn:aws:secretsmanager:us-east-1:182594598204:secret:DevOpsGitHubAccessToken-yeFTHG`,
+		// 		],
+		// 		sid: 'secretsmanager',
+		// 	}),
+		// );
 
-		// Salesforce Lambda
-		const salesforceLambda = this.createPythonLambdaFunction({
-			name: 'SalesforceLambda',
-			codePath: 'src/lambda-functions/salesforce-lambda',
-			handler: 'salesforce_lambda.lambda_handler',
-			environment: {
-				PLM_CREDS: JSON.stringify(this.environment.plmCreds),
-				PLM_IS_SANDBOX: this.environment.plmIsSandbox,
-				SF_API_VERSION: this.environment.sf_api_version,
-			},
-			memorySize: 2048,
-			ephemeralStorageSize: Size.mebibytes(1024),
-			layers: [appTempDevopsLibLambdaLayer],
-			timeout: Duration.minutes(15),
-			needsS3Permission: true,
-		});
-		salesforceLambda.role.addToPolicy(
-			new PolicyStatement({
-				actions: ['secretsmanager:GetSecretValue'],
-				effect: Effect.ALLOW,
-				resources: [
-					`arn:aws:secretsmanager:us-east-1:182594598204:secret:DevOpsGitHubAccessToken-yeFTHG`,
-				],
-				sid: 'secretsmanager',
-			}),
-		);
+		// // Salesforce Lambda
+		// const salesforceLambda = this.createPythonLambdaFunction({
+		// 	name: 'SalesforceLambda',
+		// 	codePath: 'src/lambda-functions/salesforce-lambda',
+		// 	handler: 'salesforce_lambda.lambda_handler',
+		// 	environment: {
+		// 		PLM_CREDS: JSON.stringify(this.environment.plmCreds),
+		// 		PLM_IS_SANDBOX: this.environment.plmIsSandbox,
+		// 		SF_API_VERSION: this.environment.sf_api_version,
+		// 	},
+		// 	memorySize: 2048,
+		// 	ephemeralStorageSize: Size.mebibytes(1024),
+		// 	layers: [appTempDevopsLibLambdaLayer],
+		// 	timeout: Duration.minutes(15),
+		// 	needsS3Permission: true,
+		// });
+		// salesforceLambda.role.addToPolicy(
+		// 	new PolicyStatement({
+		// 		actions: ['secretsmanager:GetSecretValue'],
+		// 		effect: Effect.ALLOW,
+		// 		resources: [
+		// 			`arn:aws:secretsmanager:us-east-1:182594598204:secret:DevOpsGitHubAccessToken-yeFTHG`,
+		// 		],
+		// 		sid: 'secretsmanager',
+		// 	}),
+		// );
 
-		const triggerStepFunction = this.createPythonLambdaFunction({
-			name: 'OmniChannelControlPlaneTriggerLambda',
-			codePath: 'src/lambda-functions/trigger_lambda',
-			handler: 'trigger_lambda.lambda_handler',
-			environment: {
-				APP_TEMP_STATE_MACHINE_ARN: this.environment.omniChannelControlPlaneStateMachineArn,
-			},
-			kmsKeyArn: this.environment.kmsKeyArn,
-			restApiId: this.environment.restApiId,
-			restApiPath: '/*/POST/trigger',
-		});
+		// const triggerStepFunction = this.createPythonLambdaFunction({
+		// 	name: 'OmniChannelControlPlaneTriggerLambda',
+		// 	codePath: 'src/lambda-functions/trigger_lambda',
+		// 	handler: 'trigger_lambda.lambda_handler',
+		// 	environment: {
+		// 		APP_TEMP_STATE_MACHINE_ARN: this.environment.omniChannelControlPlaneStateMachineArn,
+		// 	},
+		// 	kmsKeyArn: this.environment.kmsKeyArn,
+		// 	restApiId: this.environment.restApiId,
+		// 	restApiPath: '/*/POST/trigger',
+		// });
 
-		triggerStepFunction.role.addToPolicy(
-			new PolicyStatement({
-				actions: ['states:StartExecution'],
-				effect: Effect.ALLOW,
-				resources: [this.environment.omniChannelControlPlaneStateMachineArn],
-				sid: 'StartStateMachine',
-			}),
-		);
+		// triggerStepFunction.role.addToPolicy(
+		// 	new PolicyStatement({
+		// 		actions: ['states:StartExecution'],
+		// 		effect: Effect.ALLOW,
+		// 		resources: [this.environment.omniChannelControlPlaneStateMachineArn],
+		// 		sid: 'StartStateMachine',
+		// 	}),
+		// );
 
-		this.functions = {
-			appTempCompute: appTempCompute.function,
-			triggerStepFunction: triggerStepFunction.function,
-			salesforceLambda: salesforceLambda.function,
-		};
+		// this.functions = {
+		// 	appTempCompute: appTempCompute.function,
+		// 	triggerStepFunction: triggerStepFunction.function,
+		// 	salesforceLambda: salesforceLambda.function,
+		// };
 	}
 
 	private createPythonLambdaFunction(params: {

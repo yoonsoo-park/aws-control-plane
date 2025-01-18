@@ -52,8 +52,8 @@
 		"url": "https://github.com/yoonsoo-park/aws-control-plane"
 	},
 	"scripts": {
-		"aws:deploy": "cdk deploy --all -c suffix=$(whoami) -c stage=blue -c devMode=true --require-approval never",
-		"aws:destroy": "cdk destroy OmniChannelControlPlane-WebsiteStack-$(whoami) OmniChannelControlPlane-ApiStack-$(whoami) -c suffix=$(whoami) --force",
+		"aws:deploy": "cdk deploy --all -c suffix=$(whoami | tr -d '.') -c stage=blue -c devMode=true --require-approval never",
+		"aws:destroy": "cdk destroy OmniChannelControlPlane-WebsiteStack-$(whoami | tr -d '.') OmniChannelControlPlane-ApiStack-$(whoami | tr -d '.') -c suffix=$(whoami | tr -d '.') --force",
 		"build": "tsc",
 		"format": "eslint . --fix --ext .js,.ts --quiet",
 		"prebuild": "npm run format",
